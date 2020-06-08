@@ -11,7 +11,7 @@
             <label><input type="text" name="username" v-focus v-model="name">
             </label><br>
             密&nbsp;&nbsp;码：
-            <label><input type="password" name="auth_key" v-model="auth_key" @key.up.native="getInfo">
+            <label><input type="password" name="auth_key" v-model="auth_key" @@keyup.enter="getInfo">
         </label><br>
         </form>
         <p class="info" v-html="info"></p>
