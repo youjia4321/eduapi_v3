@@ -10,7 +10,7 @@ from models import db
 from datetime import datetime
 
 
-class User(db.Model):
+class User(db.Model):  # 用户
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(20), unique=True, nullable=False)
     auth_key = db.Column(db.String(255), nullable=False)
@@ -25,3 +25,21 @@ class User(db.Model):
 
     def check_pwd(self, auth_key):
         return check_password_hash(self.auth_key, auth_key)
+
+
+class BaseModel(db.Model):
+    __abstract__ = True  # 作用：不会作为普通模型的创建对应的表(抽象模型)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(20), unique=True, nullable=False)
+
+
+# 继承BaseModel：
+class Role(BaseModel):  # 用户角色
+    def __repr__(self):
+        return '<Role %r>' % self.name
+
+
+class Permission(BaseModel):  # 用户权限
+    def __repr__(self):
+        return '<Role %r>' % self.name
+
