@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block title %}
+    <title>注册页面</title>
+{% endblock %}
+
+{% block content %}
+    <div class="container" id="app">
+        <register></register>
+        <form class="form-group">
+            用&nbsp;&nbsp;户：
+            <label><input type="text" name="username" @blur="verityName" v-focus v-model="userInfo.name"></label><br>
+            密&nbsp;&nbsp;码：
+            <label><input type="password" name="auth_key" v-model="userInfo.auth_key"></label><br>
+            确&nbsp;&nbsp;认：
+            <label><input type="password" name="auth_key_confirm" @blur="verityAuthKey" v-model="userInfo.auth_key_confirm"></label><br>
+            昵&nbsp;&nbsp;称：
+            <label><input type="text" name="nick_name" v-model="userInfo.nick_name"></label><br>
+            手&nbsp;&nbsp;机：
+            <label><input type="text" name="phone" v-model="userInfo.phone"></label><br>
+        </form>
+        <p class="info" v-html="info"></p>
+        <button class="btn btn-success" @click="submitForm">点击验证</button>
+
+    </div>
+
+<script type="text/javascript">
+
+    // 注册组件
+    Vue.component('register', {
+      template: '<h2>注&nbsp;&nbsp;&nbsp;&nbsp;册</h2>'
+    });
+
+    // 注册一个全局自定义指令 v-focus
+    Vue.directive('focus', {
+      // 当绑定元素插入到 DOM 中。
+      inserted: function (el) {
+        // 聚焦元素
+        el.focus()
+      }
+    });
+
+    const vm = new Vue({
+        el: "#app",
+        data: {
+            info: "",
+            userInfo: {
+                name: "",
+                auth_key: "",
+                auth_key_confirm: "",
+                nick_name: "",
+                phone: ""
+            }
+
+        },
+        methods: {
+            verityName() { // 验证用户名是否可以被注册
+                let _this = this;
+                _this.info = "";
+                $.ajax({
+                    url: '/user/name/verity',
+                    type: 'post',
+                    dataType: 'json',
+                    data: {'name': this.userInfo.name},
+                    success: function (result) {
+                        _this.info = result.msg;
+                    }
+                });
+            },
+            verityAuthKey() { // 验证密码是否一样
+                let _this = this;
+                _this.info = "";
+                if(_this.userInfo.auth_key === _this.userInfo.auth_key_confirm){} else {
+                    _this.info = '两次密码不一致';
+                }
+            },
+            submitForm() { // 提交表单
+                let _this = this;
+                _this.info = "";
+                $.ajax({
+                    url: '/user/register',
+                    type: 'post',
+                    dataType: 'json',
+                    data: _this.userInfo,
+                    success: function (result) {
+                        _this.info = result.msg;
+                    }
+                });
+            }
+        }
+    });
+
+</script>
+{% endblock %}
