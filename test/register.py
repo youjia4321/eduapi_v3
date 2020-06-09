@@ -23,7 +23,7 @@ class TestUser(TestCase):
 
         print(resp.json())
 
-        self.assertEqual(resp.json()['code'], 200, '请求失败')
+        self.assertEqual(resp.json()['code'], 203, '请求失败')
 
 
 

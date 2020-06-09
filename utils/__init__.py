@@ -5,3 +5,8 @@
 # @Site : 
 # @File : __init__.py.py
 # @Software: PyCharm
+from redis import Redis
+
+
+# redis数据库对象
+rd = Redis(host='localhost', port=6379, password='123456', db=2, decode_responses=True)
