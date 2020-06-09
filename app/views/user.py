@@ -37,6 +37,16 @@ def is_phone_verity(phone):
     return True
 
 
+@blue.route('/name/verity', methods=['POST'])
+def verity_name():
+    name = request.form.get('name', '')
+    if len(name.strip()) == 0:
+        return jsonify({'code': 10000, 'msg': USER_CONFIG.get(10000)})
+    if check_user(name):
+        return jsonify({'code': 201, 'msg': USER_CONFIG.get(201)})
+    return jsonify({'code': 403, 'msg': USER_CONFIG.get(403)})
+
+
 @blue.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -50,20 +60,26 @@ def login():
     return render_template('/user/login.html')
 
 
-@blue.route('/register', methods=['POST'])
+@blue.route('/register', methods=['GET', 'POST'])
 def register():
-    user_info = {
-        'name': request.form.get('name', None),
-        'auth_key': request.form.get('auth_key', None),
-        'nick_name': request.form.get('nick_name', None),
-        'phone': request.form.get('phone', None),
-    }
-    user_info['auth_key'] = generate_password_hash(user_info['auth_key'])
-    if check_user(user_info['name']):
-        if is_phone_verity(user_info['phone']):
-            user = User(**user_info)
-            db.session.add(user)
-            db.session.commit()
-            return redirect(url_for('userBlue.login'))
-        return jsonify({'code': 500, 'msg': USER_CONFIG.get(500)})
-    return jsonify({'code': 403, 'msg': USER_CONFIG.get(403)})
+    if request.method == 'POST':
+        name = request.form.get('name', None),
+        auth_key = request.form.get('auth_key', None)
+        nick_name = request.form.get('nick_name', None)
+        phone = request.form.get('phone', None)
+        if all((name, auth_key, nick_name, phone)):
+            user_info = {
+                'name': name,
+                'auth_key': auth_key,
+                'nick_name': nick_name,
+                'phone': phone
+            }
+            user_info['auth_key'] = generate_password_hash(user_info['auth_key'])
+            if is_phone_verity(user_info['phone']):
+                user = User(**user_info)
+                db.session.add(user)
+                db.session.commit()
+                return jsonify({'code': 203, 'msg': USER_CONFIG.get(203)})
+            return jsonify({'code': 500, 'msg': USER_CONFIG.get(500)})
+        return jsonify({'code': 501, 'msg': USER_CONFIG.get(501)})
+    return render_template('/user/register.html')
