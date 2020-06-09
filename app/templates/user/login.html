@@ -11,7 +11,7 @@
             <label><input type="text" name="username" v-focus v-model="name">
             </label><br>
             密&nbsp;&nbsp;码：
-            <label><input type="password" name="auth_key" v-model="auth_key" @@keyup.enter="getInfo">
+            <label><input type="password" name="auth_key" v-model="auth_key" @keyup.enter="getInfo">
         </label><br>
         </form>
         <p class="info" v-html="info"></p>
@@ -48,19 +48,18 @@
                     'name': this.name,
                     'auth_key': this.auth_key
                 };
-                let response;
+                let _this = this; // 使用_this来代替Vue中的this变量，防止与ajax中的this重复
+                _this.info = "";
                 $.ajax({
-                    async: false,  // 设置为同步(ajax的this把vue的this覆盖 取不到this.info)
+                    // async: false,  // 设置为同步(ajax的this把vue的this覆盖 取不到this.info)
                     url: '/user/login',
                     type: 'post',
                     dataType: 'json',
                     data: formData,
                     success: function (result) {
-                        response = result
+                        _this.info = result
                     }
                 });
-
-                this.info = response
             }
         }
     });
