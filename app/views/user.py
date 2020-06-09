@@ -30,6 +30,13 @@ def is_login_verity(name=None, auth_key=None):
     return False
 
 
+def is_phone_verity(phone):
+    user = User.query.filter_by(phone=phone).first()
+    if user:
+        return False
+    return True
+
+
 @blue.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -53,8 +60,10 @@ def register():
     }
     user_info['auth_key'] = generate_password_hash(user_info['auth_key'])
     if check_user(user_info['name']):
-        user = User(**user_info)
-        db.session.add(user)
-        db.session.commit()
-        return redirect(url_for('userBlue.login'))
-    return jsonify({'code': 404, 'msg': '用户名已存在'})
+        if is_phone_verity(user_info['phone']):
+            user = User(**user_info)
+            db.session.add(user)
+            db.session.commit()
+            return redirect(url_for('userBlue.login'))
+        return jsonify({'code': 500, 'msg': USER_CONFIG.get(500)})
+    return jsonify({'code': 403, 'msg': USER_CONFIG.get(403)})
