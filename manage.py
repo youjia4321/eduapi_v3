@@ -21,6 +21,8 @@ from utils import cache
 def process_request(*args, **kwargs):
     white_list = ['/user/login', '/user/register', '/user/name/verity']
     token = request.cookies.get('token')
+    if request.path.startswith('/s'):  # 处理静态文件路径
+        return None
     if request.path in white_list:  # 如果是请求白名单页面,则放行,否则会死循环
         if token:
             user_id = cache.get_user_id(token)
