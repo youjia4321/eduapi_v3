@@ -5,12 +5,15 @@
 # @Site : 
 # @File : user.py
 # @Software: PyCharm
+import uuid
+from datetime import datetime, timedelta
 from flask import Blueprint, abort, jsonify, redirect, url_for
 from flask import request, render_template
 from models.user import User
 from models import db
 from werkzeug.security import generate_password_hash
 from settings import USER_CONFIG
+from utils import cache
 
 blue = Blueprint('userBlue', __name__)
 
@@ -26,8 +29,9 @@ def check_user(name):  # 判断用户名是否能注册
 def is_login_verity(name=None, auth_key=None):
     user = User.query.filter_by(name=name).first()
     if user:
-        return user.check_pwd(auth_key)
-    return False
+        if user.check_pwd(auth_key):
+            return user
+    return None
 
 
 def is_phone_verity(phone):
@@ -47,14 +51,28 @@ def verity_name():
     return jsonify({'code': 403, 'msg': USER_CONFIG.get(403)})
 
 
+@blue.route('/logout', methods=['GET'])
+def logout():
+    resp = redirect('/user/login')
+    resp.delete_cookie('token')
+    token = request.cookies.get('token')
+    cache.clear_token(token)
+    return resp
+
+
 @blue.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         name = request.form.get('name', None)
         auth_key = request.form.get('auth_key', None)
         if all((name, auth_key)):
-            if is_login_verity(name, auth_key):
-                return jsonify({'code': 200, 'msg': USER_CONFIG.get(200)})
+            login_user = is_login_verity(name, auth_key)
+            if login_user:
+                # 登录成功 生成token
+                token = uuid.uuid4().hex
+                # 将token添加到redis，token->user_id
+                cache.save_token(token, login_user.id)
+                return jsonify({'code': 200, 'token': token, 'msg': USER_CONFIG.get(200)})
             return jsonify({'code': 404, 'msg': USER_CONFIG.get(404)})
         return jsonify({"code": 10001, "msg": USER_CONFIG.get(10001)})
     return render_template('/user/login.html')
