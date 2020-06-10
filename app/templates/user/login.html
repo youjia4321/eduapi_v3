@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'user_base.html' %}
 {% block title %}
     <title>登录页面</title>
 {% endblock %}
@@ -63,11 +63,12 @@
                     dataType: 'json',
                     data: formData,
                     success: function (result) {
-                        _this.info = result;
                         if(result.code === 200) {
                             // 登录成功则设置用户的token
                             _this.setCookie('token', result.token, 3);
                             window.location = '/'
+                        } else {
+                            _this.info = result;
                         }
                     }
                 });
