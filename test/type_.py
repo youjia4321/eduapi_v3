@@ -47,7 +47,7 @@ class BaseField(object):
 
 
 class CharField(BaseField):
-    def __init__(self, length):
+    def __init__(self, length=20):
         self.length = length
 
 
@@ -101,7 +101,7 @@ class Person(Model):
     __tablename__ = 't_person'
 
     id = IntegerField()
-    name = CharField(50)
+    name = CharField()
     city = CharField(20)
 
 
