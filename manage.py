@@ -38,7 +38,9 @@ def process_request(*args, **kwargs):
 
 @app.route('/', methods=['GET'])
 def index():
-    return render_template("index.html")
+    user_id = cache.get_user_id(request.cookies.get('token'))
+    u = User.query.get(user_id)
+    return render_template("index.html", user=u)
 
 
 @app.route('/create_db')
