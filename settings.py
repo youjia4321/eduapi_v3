@@ -5,6 +5,8 @@
 # @Site : 
 # @File : settings.py
 # @Software: PyCharm
+import os
+
 from redis import Redis
 
 
@@ -19,6 +21,12 @@ USER_CONFIG = {
     10000: '用户不能为空',
     10001: '用户或密码不能为空'
 }
+
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+BASE_DIR = os.path.join(PROJECT_DIR, 'app')
+STATIC_DIR = os.path.join(BASE_DIR, 'static')
+MEDIA_DIR = os.path.join(STATIC_DIR, 'media')
 
 
 class Dev(object):
