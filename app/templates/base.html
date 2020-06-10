@@ -26,8 +26,13 @@
             <li><a href="#">会员服务</a></li>
             <li><a>{{ user.nick_name }}</a></li>
             <li class="last"><a href="/user/logout">退了</a></li>
-              <li><a><img src="{{ user.photo }}" width="20px" style="border-radius: 50%"></a></li>
+            <li><a id="photo"><img id="photoImg" title="点击修改头像" src="{{ user.photo }}" onclick="selectImg()"></a></li>
           </ul>
+            <input type="file"
+                   name="photo"
+                   id="upload"
+                   onchange="upload(this.files[0])"
+                   style="display: none"/>
           <div class="search">
             <form id="form" name="form" method="post" action="">
               <span>
@@ -87,10 +92,22 @@
   <script type="text/javascript" src="/s/js/layui/layui.all.js"></script>
   <script type="text/javascript" src="/s/js/bootstrap.min.js"></script>
   <script type="text/javascript" src="/s/js/vue.min.js"></script>
+  <script type="text/javascript" src="/s/base/js/upload.js"></script>
 <style>
-  .title {
-    color: #000;
-    font-size: 16px;
+  #photo{
+      width: 20px;
+      height: 20px;
+      border: #000 solid 0px;
+    }
+  #photo img{
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      transition: all 0.6s;
+      border-radius: 50%;
+  }
+  #photo img:hover{
+      transform: scale(1.7);
   }
 </style>
 </body>
