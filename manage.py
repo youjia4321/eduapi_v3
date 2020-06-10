@@ -5,7 +5,7 @@
 # @Site : 
 # @File : manage.py.py
 # @Software: PyCharm
-from flask import render_template
+from flask import render_template, request, redirect, url_for
 
 from app import app
 from flask_script import Manager, Server
@@ -14,6 +14,26 @@ from app.views import user
 # 必须要引入SQLALCHEMY设计的模型 创建才能成功
 from models.user import User
 from models import db
+from utils import cache
+
+
+@app.before_request
+def process_request(*args, **kwargs):
+    white_list = ['/user/login', '/user/register', '/user/name/verity']
+    token = request.cookies.get('token')
+    if request.path in white_list:  # 如果是请求白名单页面,则放行,否则会死循环
+        if token:
+            user_id = cache.get_user_id(token)
+            if user_id:  # 如果user_id存在则放行,否则重定向到主页面
+                return redirect(url_for('index'))
+        return None
+    else:
+        if not token:
+            return redirect(url_for('userBlue.login'))
+        user_id = cache.get_user_id(token)
+        if user_id:  # 如果user_id存在则放行,否则重定向到登录页面
+            return None
+        return redirect(url_for('userBlue.login'))
 
 
 @app.route('/', methods=['GET'])
