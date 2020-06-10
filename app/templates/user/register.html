@@ -69,22 +69,34 @@
             verityAuthKey() { // 验证密码是否一样
                 let _this = this;
                 _this.info = "";
-                if(_this.userInfo.auth_key === _this.userInfo.auth_key_confirm){} else {
-                    _this.info = '两次密码不一致';
+                const reg = /^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,}$/;
+                if(reg.test(_this.userInfo.auth_key)) {
+                    if(_this.userInfo.auth_key === _this.userInfo.auth_key_confirm){
+                        return true;
+                    } else {
+                        _this.info = '两次密码不一致';
+                        return false;
+                    }
+                } else {
+                    _this.info = '密码是包含数字和字母的至少6位的字符串';
+                    return false;
                 }
+
             },
             submitForm() { // 提交表单
                 let _this = this;
                 _this.info = "";
-                $.ajax({
-                    url: '/user/register',
-                    type: 'post',
-                    dataType: 'json',
-                    data: _this.userInfo,
-                    success: function (result) {
-                        _this.info = result.msg;
-                    }
-                });
+                if(_this.verityAuthKey()) {
+                    $.ajax({
+                        url: '/user/register',
+                        type: 'post',
+                        dataType: 'json',
+                        data: _this.userInfo,
+                        success: function (result) {
+                            _this.info = result.msg;
+                        }
+                    });
+                }
             }
         }
     });
