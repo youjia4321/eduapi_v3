@@ -5,14 +5,17 @@
 # @Site : 
 # @File : user.py
 # @Software: PyCharm
+import os
 import uuid
 from datetime import datetime, timedelta
 from flask import Blueprint, abort, jsonify, redirect, url_for
 from flask import request, render_template
+from werkzeug.datastructures import FileStorage
+
 from models.user import User
 from models import db
 from werkzeug.security import generate_password_hash
-from settings import USER_CONFIG
+from settings import USER_CONFIG, MEDIA_DIR
 from utils import cache
 
 blue = Blueprint('userBlue', __name__)
@@ -101,3 +104,22 @@ def register():
             return jsonify({'code': 500, 'msg': USER_CONFIG.get(500)})
         return jsonify({'code': 501, 'msg': USER_CONFIG.get(501)})
     return render_template('/user/register.html')
+
+
+@blue.route('/upload', methods=['POST'])
+def upload_photo():
+    upload_file: FileStorage = request.files.get('photo')
+    u = User.query.get(cache.get_user_id(request.cookies.get('token')))
+    filename = uuid.uuid4().hex + os.path.splitext(upload_file.filename)[-1]
+    filepath = os.path.join(MEDIA_DIR, filename)
+    upload_file.save(filepath)
+
+    resp_path = '/s/media/' + filename
+    u.photo = resp_path
+    db.session.commit()
+
+    return jsonify({
+        'code': 200,
+        'msg': '上传成功',
+        'path': resp_path
+    })
