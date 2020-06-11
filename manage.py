@@ -19,7 +19,8 @@ from utils import cache
 
 @app.before_request
 def process_request(*args, **kwargs):
-    white_list = ['/user/login', '/user/register', '/user/name/verity']
+    app.logger.info(request.path + '被访问了')  # 记录被访问的路径
+    white_list = ['/user/login', '/user/register', '/user/name/verity', '/log']
     token = request.cookies.get('token')
     if request.path.startswith('/s'):  # 处理静态文件路径
         return None
