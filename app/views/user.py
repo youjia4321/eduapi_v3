@@ -96,12 +96,14 @@ def register():
                 'phone': phone
             }
             user_info['auth_key'] = generate_password_hash(user_info['auth_key'])
-            if is_phone_verity(user_info['phone']):
-                user = User(**user_info)
-                db.session.add(user)
-                db.session.commit()
-                return jsonify({'code': 203, 'msg': USER_CONFIG.get(203)})
-            return jsonify({'code': 500, 'msg': USER_CONFIG.get(500)})
+            if check_user(user_info['name']):
+                if is_phone_verity(user_info['phone']):
+                    user = User(**user_info)
+                    db.session.add(user)
+                    db.session.commit()
+                    return jsonify({'code': 203, 'msg': USER_CONFIG.get(203)})
+                return jsonify({'code': 500, 'msg': USER_CONFIG.get(500)})
+            return jsonify({'code': 403, 'msg': USER_CONFIG.get(403)})
         return jsonify({'code': 501, 'msg': USER_CONFIG.get(501)})
     return render_template('/user/register.html')
 
